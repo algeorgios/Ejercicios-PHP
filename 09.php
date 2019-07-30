@@ -1,13 +1,18 @@
 <?php
 
 session_start();
-if (!isset($_SESSION['lista'])){
-    $_SESSION['lista']=array();
-   
 
+if (isset($_POST['borrar'])){
+    $valor = $_POST['borrar'];
+    unset($_SESSION['lista'][$valor]);
+    $_SESSION['lista'] = array_values($_SESSION['lista']);   
 }
 
-if (isset($_POST['nombre'])){
+if (!isset($_SESSION['lista'])){
+    $_SESSION['lista']=array();
+}
+
+if (isset($_POST['nombre']) && !empty($_POST['nombre'])){
     $nombre = $_POST['nombre'];    
     array_push($_SESSION['lista'], $nombre);
 }
@@ -56,7 +61,9 @@ if (isset($_POST['nombre'])){
             <form action="#" method="post">
             <?php
             foreach ($_SESSION['lista'] as $key => $nombre) {
-                echo $nombre . "<button type='submit' style='margin-left:6px; margin-top:6px' name='borrar' value='$key'>Borrar</button><br>";
+                array_values($_SESSION['lista']);
+
+                echo $nombre . "<button type='submit' style='margin-left:6px; margin-top:6px' name='borrar' value='$key'>Eliminar</button><br>";
             }
             ?>
             </form>
@@ -71,16 +78,12 @@ if (isset($_POST['nombre'])){
         
         if (isset($_POST['azar'])){
             $lista = $_SESSION['lista'];
-            $i = array_rand($lista);
-            echo $lista[$i];
-        }
-
-        if (isset($_POST['borrar'])){
-            $lista = $_SESSION['lista'];
-            $key = $_POST['borrar'];
-            echo $key;
-            echo ($lista[$key]);
-
+            
+            if (!empty($lista)){
+                $i = array_rand($lista);
+            } else {
+                echo "La lista está vacía.";
+            }
         }
         ?>
         </p>
@@ -91,3 +94,6 @@ if (isset($_POST['nombre'])){
 
 </body>
 </html>
+
+<?php
+print_r($_SESSION['lista']);
