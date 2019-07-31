@@ -11,7 +11,7 @@ if ($con->connect_error){
     $mensaje = "Conexion OK";
 }
 
-$consulta = "SELECT * FROM muestras ORDER BY temperatura DESC";
+$consulta = "SELECT * FROM muestras ORDER BY fecha DESC LIMIT 500";
 
 $resultado = $con->query($consulta);
 
@@ -60,7 +60,6 @@ $resultado = $con->query($consulta);
                 
                 $con->close();
              ?>
-        </p>
     </div>
 </body>
 </html>

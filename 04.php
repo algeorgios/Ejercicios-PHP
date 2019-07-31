@@ -4,7 +4,7 @@ $con = new mysqli("localhost", "root", "", "muestrastemperatura");
 $con->set_charset("utf-8");
 
 if ($con->connect_error){
-    echo "No se ha podido conectar con la base de datos";
+    die("No se ha podido conectar con la base de datos");
 }
 
 if (isset($_POST['insertar'])){
@@ -18,7 +18,7 @@ if (isset($_POST['insertar'])){
         $hora = $_POST['hora'];
         $temp = $_POST['temp'];
         
-        if ($stmt==false){
+        if ($stmt == false){
             $con->close();
             die("Error en la consulta");
         }        
@@ -33,7 +33,6 @@ if (isset($_POST['insertar'])){
 
 }
 
-$con->close();
 ?>
 
 
@@ -55,6 +54,7 @@ $con->close();
         }
         input {
             text-align: center;
+            padding: 6px;
         }
         input::placeholder{
             text-align: center;
@@ -66,6 +66,7 @@ $con->close();
         }
         a {
             text-decoration: none;
+            color: black;
         }
         button, input[type='submit']{
             border: none;
@@ -89,15 +90,14 @@ $con->close();
     
     <form action="#" method="post">
         <label for="">Fecha: </label>
-        <input type="text" placeholder="yyyy/mm/dd" name="fecha"><br><br>
+        <input type="date" name="fecha"><br><br>
         <label for="">Hora: </label>
-        <input type="text" placeholder="hh:mm" name="hora"><br><br>
+        <input type="time" name="hora"><br><br>
         <label for="">Temperatura</label>
         <input type="text" placeholder="ºC" name="temp"><br><br>
         <input class="rojo" type="submit" name="insertar" value="Insertar Registro">
         <button class="verde"><a href="05.php">Ver Registros</a></button>
     </form>    
-    </form>
     <div>
         <p>
             <?php
@@ -107,6 +107,50 @@ $con->close();
              }
              ?>
         </p>
+    </div>
+
+    <hr>
+    <form action="#" method="post">
+        <legend>Filtrar por fechas</legend><br>
+        Desde: <input type="date" name="fecha1"><br><br>
+        Hasta: <input type="date" name="fecha2"><br><br>
+        <button style='background:blue; color:white' type="submit" name="filtro">Filtrar</button>
+    </form>
+    <div>
+        <?php
+            if (isset($_POST['filtro'])){
+                if (!empty($_POST['fecha1']) && !empty($_POST['fecha1'])){
+                    
+
+                    $consulta = "SELECT fecha, hora, temperatura FROM muestras WHERE fecha > ? AND fecha < ?";
+                    $stmt = $con->prepare($consulta);
+                    $stmt->bind_param('ss', $fecha1, $fecha2);
+
+                    $fecha1 = $_POST['fecha1'];
+                    $fecha2 = $_POST['fecha2'];
+
+                    if ($stmt == false){
+                        $con->close();
+                        die("Error en la consulta");
+                    }
+
+                    $stmt->execute();
+                    $stmt->bind_result($fecha, $hora, $temp);
+                 
+                    while($stmt->fetch()){
+                        echo "<p style='color:green'><strong>$fecha</strong> - $hora - <strong>$temp ºC</strong></p>";
+                    }
+                    $stmt->close();
+
+                } else {
+                    echo "<p>Falta alguna fecha</p>";
+                }    
+
+            }
+                       
+            $con->close();
+
+        ?>
     </div>
 </body>
 </html>
